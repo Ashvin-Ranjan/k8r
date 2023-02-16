@@ -28,6 +28,9 @@ files:
     - name: .gitignore
       template: .gitignore.tpl
       module: github.com/getoutreach/stencil-base
+    - name: .goreleaser.yml
+      template: .goreleaser.yml.tpl
+      module: github.com/getoutreach/stencil-golang
     - name: .prettierignore
       template: .prettierignore.tpl
       module: github.com/getoutreach/stencil-golang
@@ -61,6 +64,9 @@ files:
     - name: README.md
       template: README.md.tpl
       module: github.com/getoutreach/stencil-base
+    - name: cmd/k8r/k8r.go
+      template: cmd/main_cli.go.tpl
+      module: github.com/getoutreach/stencil-golang
     - name: devenv.yaml
       template: devenv.yaml.tpl
       module: github.com/getoutreach/stencil-golang

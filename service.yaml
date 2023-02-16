@@ -1,14 +1,16 @@
 name: k8r
-arguments: 
+arguments:
   reportingTeam: fnd-dt
   description: "Tool for debugging Kubernetes clusters"
+  commands:
+    - k8r
 description: "Tool for debugging Kubernetes clusters"
 
 # Below is a list of modules to use for this application
 # It should follow the following format:
 # - name: <moduleImportPath>
 #   version: "optional-version-to-pin-to"
-modules: 
+modules:
   - name: github.com/getoutreach/stencil-base
   - name: github.com/getoutreach/stencil-golang
     version: v1.7.0-rc.3
