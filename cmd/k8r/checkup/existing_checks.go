@@ -5,7 +5,7 @@
 
 // Description: This file contains code for problems related to pods
 
-package debug
+package checkup
 
 import (
 	"context"

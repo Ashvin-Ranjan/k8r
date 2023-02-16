@@ -5,7 +5,7 @@
 
 // Description: This file contains code for problem creation
 
-package debug
+package checkup
 
 import (
 	"context"

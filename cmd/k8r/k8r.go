@@ -13,7 +13,6 @@ import (
 	gcli "github.com/getoutreach/gobox/pkg/cli"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
-
 	// Place any extra imports for your startup code here
 	// <<Stencil::Block(imports)>>
 	"github.com/Ashvin-Ranjan/k8r/cmd/k8r/checkup"
@@ -52,7 +51,8 @@ func main() {
 		Version: oapp.Version,
 		Name:    "k8r",
 		// <<Stencil::Block(app)>>
-		Description: "Kubedoctor. A program to help diagnose issues with Kubernetes clusters.",
+		Description:    "A program to help diagnose issues with Kubernetes clusters.",
+		DefaultCommand: "checkup",
 		// <</Stencil::Block>>
 	}
 	app.Flags = []cli.Flag{
@@ -62,7 +62,7 @@ func main() {
 	}
 	app.Commands = []*cli.Command{
 		// <<Stencil::Block(commands)>>
-		checkup.NewCommand(log),
+		// checkup.NewCommand(log),
 		// <</Stencil::Block>>
 	}
 

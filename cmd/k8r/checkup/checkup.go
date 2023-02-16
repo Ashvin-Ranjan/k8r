@@ -11,7 +11,7 @@
 // EDITED DESCRIPTION: Descripe checkup instead of debug
 // Package checkup implements a 'k8r checkup' command that allows
 // developers to debug their Kubernetes clusters.
-package debug
+package checkup
 
 import (
 	"context"
