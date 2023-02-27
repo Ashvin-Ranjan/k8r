@@ -1,4 +1,4 @@
-module github.com //k8r
+module github.com/Ashvin-Ranjan/k8r //k8r
 
 // This is locked to 1.17 to ensure that generics
 // are not in use. This will be removed in the near future.
@@ -60,6 +60,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
+	github.com/kr/pretty v0.3.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/manifoldco/promptui v0.9.0 // indirect
@@ -81,6 +82,7 @@ require (
 	github.com/prometheus/common v0.33.0 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/rivo/uniseg v0.4.2 // indirect
+	github.com/rogpeppe/go-internal v1.6.2 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/schollz/progressbar/v3 v3.12.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
