@@ -25,17 +25,29 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
+	v1 "k8s.io/api/autoscaling/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// enabledProblems is a list of problems checkers that are enabled
-var enabledProblems = []Problem{
+// enabledPodProblems is a list of pod problem checkers that are enabled
+var enabledPodProblems = []Problem{
 	ProblemPodCrashLoopBackOff,
 	ProblemPodNotReady,
 	ProblemPodImagePullBackOff,
 	ProblemPodOOMKilled,
+	// EDITS: New problems added
+	ProblemHighRestarts,
 }
+
+// EDIT: 2 new lists added
+// enabledHPAProblems is a list of HPA problem checkers that are enabled
+var enabledHPAProblems = []Problem{
+	ProblemMaxedOutHPAs,
+}
+
+// enbaledProblems is a list of all problem checkers that are enabled
+var enabledProblems = append(enabledPodProblems, enabledHPAProblems...)
 
 // contains string helpers
 var (
@@ -46,8 +58,10 @@ var (
 
 // Options contains options for the devenv debug
 // command
+// EDIT: Change fields to add in Config
 type Options struct {
 	log logrus.FieldLogger
+	cfg *Config
 }
 
 // NewOptions contains options for the devenv debug
@@ -66,14 +80,29 @@ func NewCommand(log logrus.FieldLogger) *cli.Command {
 		// Edited Name and Usage of command
 		Name:  "checkup",
 		Usage: "Debug Kubernetes clusters",
+		// EDIT: Pass in config
 		Action: func(c *cli.Context) error {
-			if c.NArg() != 0 {
-				return fmt.Errorf("this command takes no arguments")
+			o.cfg = &Config{
+				RestartThreshold: c.Int("restart-threshold"),
 			}
-
 			return o.Run(c.Context)
 		},
+		// EDIT: Add flags
+		Flags: []cli.Flag{
+			&cli.IntFlag{
+				Name:  "restart-threshold",
+				Usage: "Sets the restart threshold for the HighRestarts problem",
+				Value: 3,
+			},
+		},
 	}
+}
+
+// EDIT: Add type
+// Config stored all the flags passed in
+type Config struct {
+	// RestartThreshold is from the restart-threshold flag
+	RestartThreshold int
 }
 
 // ResourceProblem is a problem with a resource, e.g. a pod
@@ -116,8 +145,39 @@ func (o *Options) getPodsWithProblems(ctx context.Context, pod *corev1.Pod) ([]R
 	}
 
 	// check if the pod has a problem from the enabled problems
-	for _, problem := range enabledProblems {
-		resourceDetails, warning, occurring := problem.Detector(ctx, pod)
+	for _, problem := range enabledPodProblems {
+		// Pass in Config
+		resourceDetails, warning, occurring := problem.Detector(ctx, pod, o.cfg)
+		if !occurring {
+			continue
+		}
+
+		p := defaultProblem
+		p.ProblemID = problem.ID
+		p.ProblemDetails = resourceDetails
+		p.Warning = warning
+		problems = append(problems, p)
+	}
+
+	return problems, len(problems) > 0
+}
+
+// EDIT: New function
+// getHPAsWithProblems creates a list of problem HPAs
+func (o *Options) getHPAsWithProblems(ctx context.Context, hpa *v1.HorizontalPodAutoscaler) ([]Resource, bool) {
+	problems := make([]Resource, 0)
+
+	// defaultProblem is a problem that for the pod with prefilled
+	// information, use this when you create a problem for a pod
+	defaultProblem := Resource{
+		Owner: hpa.Labels["reporting_team"],
+		Name:  fmt.Sprintf("%s/%s", hpa.Namespace, hpa.Name),
+		Type:  "HPA",
+	}
+
+	// check if the pod has a problem from the enabled problems
+	for _, problem := range enabledHPAProblems {
+		resourceDetails, warning, occurring := problem.Detector(ctx, hpa, o.cfg)
 		if !occurring {
 			continue
 		}
@@ -145,14 +205,30 @@ func (o *Options) Run(ctx context.Context) error { //nolint:funlen // Why: Best 
 		return errors.Wrap(err, "failed to list pods")
 	}
 
+	// EDIT: Get HPAs
+	HPAs, err := k.AutoscalingV1().HorizontalPodAutoscalers(metav1.NamespaceAll).List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return errors.Wrap(err, "failed to list hpas")
+	}
+
 	bold.Printf("Checking for problems ... ")
 	resourceProblems := []Resource{}
+
 	for i := range pods.Items {
 		p := &pods.Items[i]
 		if rs, is := o.getPodsWithProblems(ctx, p); is {
 			resourceProblems = append(resourceProblems, rs...)
 		}
 	}
+
+	// EDIT: Check HPAs
+	for i := range HPAs.Items {
+		h := &HPAs.Items[i]
+		if rs, is := o.getHPAsWithProblems(ctx, h); is {
+			resourceProblems = append(resourceProblems, rs...)
+		}
+	}
+
 	bold.Println("done")
 	if len(resourceProblems) == 0 {
 		fmt.Println("Everything looks good 🎉")

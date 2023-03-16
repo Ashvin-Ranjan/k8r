@@ -25,6 +25,7 @@ const (
 )
 
 // Problem is a problem that was found in the devenv environment
+// EDIT: Change Detector method signature
 type Problem struct {
 	// ID is a unique identifier for the problem used to group
 	// problems together for different resources.
@@ -38,7 +39,7 @@ type Problem struct {
 	HelpURL string
 
 	// Detector is a function that detects if this problem exists.
-	Detector func(context.Context, runtime.Object) (resourceSpecificReason string, warning, isOccurring bool)
+	Detector func(context.Context, runtime.Object, *Config) (resourceSpecificReason string, warning, isOccurring bool)
 }
 
 // Resource is a resource that has a problem associated with it

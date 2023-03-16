@@ -5,6 +5,8 @@
 
 // Description: This file contains code for problems related to pods
 
+// EDIT: All Detector functions have had their method signatures changed
+
 package checkup
 
 import (
@@ -20,7 +22,7 @@ import (
 var ProblemPodCrashLoopBackOff = Problem{
 	ID:               "PodCrashLoopBackOff",
 	ShortDescription: "A pod is in a crash loop backoff state, meaning it is crashing repeatedly",
-	Detector: func(ctx context.Context, obj runtime.Object) (string, bool, bool) {
+	Detector: func(ctx context.Context, obj runtime.Object, _ *Config) (string, bool, bool) {
 		pod, ok := obj.(*corev1.Pod)
 		if !ok {
 			return "", false, false
@@ -59,7 +61,7 @@ var ProblemPodCrashLoopBackOff = Problem{
 var ProblemPodNotReady = Problem{
 	ID:               "PodNotReady",
 	ShortDescription: "A pod is not ready which can indicate a problem with the pod",
-	Detector: func(ctx context.Context, obj runtime.Object) (string, bool, bool) {
+	Detector: func(ctx context.Context, obj runtime.Object, _ *Config) (string, bool, bool) {
 		pod, ok := obj.(*corev1.Pod)
 		if !ok {
 			return "", false, false
@@ -90,7 +92,7 @@ var ProblemPodNotReady = Problem{
 var ProblemPodImagePullBackOff = Problem{
 	ID:               "PodImagePullBackOff",
 	ShortDescription: "A pod is in a image pull backoff state, meaning it is unable to pull the image",
-	Detector: func(ctx context.Context, obj runtime.Object) (string, bool, bool) {
+	Detector: func(ctx context.Context, obj runtime.Object, _ *Config) (string, bool, bool) {
 		pod, ok := obj.(*corev1.Pod)
 		if !ok {
 			return "", false, false
@@ -153,7 +155,7 @@ var ProblemPodImagePullBackOff = Problem{
 var ProblemPodOOMKilled = Problem{
 	ID:               "PodOOMKilled",
 	ShortDescription: "A pod was killed because it ran out of memory recently",
-	Detector: func(ctx context.Context, obj runtime.Object) (string, bool, bool) {
+	Detector: func(ctx context.Context, obj runtime.Object, _ *Config) (string, bool, bool) {
 		pod, ok := obj.(*corev1.Pod)
 		if !ok {
 			return "", false, false
@@ -185,7 +187,7 @@ var ProblemPodOOMKilled = Problem{
 var ProblemPodPending = Problem{
 	ID:               "PodPending",
 	ShortDescription: "A pod is pending",
-	Detector: func(ctx context.Context, obj runtime.Object) (string, bool, bool) {
+	Detector: func(ctx context.Context, obj runtime.Object, _ *Config) (string, bool, bool) {
 		pod, ok := obj.(*corev1.Pod)
 		if !ok {
 			return "", false, false
