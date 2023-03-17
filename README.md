@@ -16,4 +16,12 @@ Please read the [CONTRIBUTING.md](CONTRIBUTING.md) document for guidelines on de
 
 <!-- <<Stencil::Block(overview)>> -->
 
+### Quick Use
+
+To use it quickly simply run `k8r`, this will run the `checkup` command which will diagnose any issues with your Kubernetes environment.
+
+All documentation on issues will either be availiable in the current repository or at [devenv](https://github.com/getoutreach/devenv).
+
+Note: specifically for the `--restart-threshold` flag, you will need to run `k8r checkup` instead of `k8r`.
+
 <!-- <</Stencil::Block>> -->
