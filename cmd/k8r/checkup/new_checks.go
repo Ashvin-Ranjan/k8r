@@ -11,16 +11,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-// MaxedHPA is only the basic information which ProblemMaxedOutHPAs needs
-type MaxedHPA struct {
-	// Name is the name of the HPA
-	Name string
-
-	// MaxReplicas is max replicas that the HPA is allowed to make
-	MaxReplicas int32
-}
-
 // ProblemMaxedOutHPAs when HPAs for a cluster are maxed out
+// https://github.com/Ashvin-Ranjan/k8r/wiki/MaxedOutHPAs
 var ProblemMaxedOutHPAs = Problem{
 	ID:               "MaxedOutHPAs",
 	ShortDescription: "A pod's HPAs current replicas is equal to its max",
@@ -42,7 +34,7 @@ var ProblemMaxedOutHPAs = Problem{
 }
 
 // ProblemHighRestarts is a problem with a cluster that keeps on restarting
-// https://github.com/getoutreach/devenv/wiki/PodNotReady
+// https://github.com/Ashvin-Ranjan/k8r/wiki/HighRestarts
 var ProblemHighRestarts = Problem{
 	ID:               "HighRestarts",
 	ShortDescription: "A pod keeps restarting which can indicate a problem",
@@ -53,7 +45,11 @@ var ProblemHighRestarts = Problem{
 			return "", false, false
 		}
 
-		// Check if the pod has any containers that are in a crash loop
+		// We don't check if the pod is online or not because if
+		// it is constantly crashing it may be offline for long
+		// periods of time
+
+		// Check if the pod has any containers that have crash counts above the threshold
 		for i := range pod.Status.ContainerStatuses {
 			cs := &pod.Status.ContainerStatuses[i]
 			if cs.RestartCount >= int32(cfg.RestartThreshold) {
